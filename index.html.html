@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Twenty-Two Party — RSVP</title>
+  <style>
+    :root {
+      --blue: #0b4dff;
+      --deep-blue: #081a8c;
+      --red: #ff174f;
+      --deep-red: #c3003c;
+      --white: #ffffff;
+      --soft-white: rgba(255,255,255,0.88);
+      --glass: rgba(255,255,255,0.12);
+      --glass-strong: rgba(255,255,255,0.18);
+      --border: rgba(255,255,255,0.22);
+      --shadow: 0 20px 70px rgba(0,0,0,0.35);
+      --text: #f8f9ff;
+      --muted: rgba(248,249,255,0.78);
+      --success: #8cffc1;
+      --danger: #ffd2d9;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(82, 160, 255, 0.35), transparent 28%),
+        radial-gradient(circle at 80% 18%, rgba(255, 72, 117, 0.28), transparent 25%),
+        linear-gradient(135deg, #031b8d 0%, #16003a 48%, #a50034 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .bg-glow,
+    .bg-glow::before,
+    .bg-glow::after {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+    }
+
+    .bg-glow::before {
+      background: radial-gradient(circle at 15% 30%, rgba(45, 122, 255, 0.30), transparent 24%);
+      animation: driftOne 10s ease-in-out infinite alternate;
+    }
+
+    .bg-glow::after {
+      background: radial-gradient(circle at 85% 20%, rgba(255, 35, 90, 0.26), transparent 24%);
+      animation: driftTwo 11s ease-in-out infinite alternate;
+    }
+
+    @keyframes driftOne {
+      from { transform: translate(-1%, -1%) scale(1); }
+      to { transform: translate(2%, 2%) scale(1.08); }
+    }
+
+    @keyframes driftTwo {
+      from { transform: translate(1%, 0%) scale(1); }
+      to { transform: translate(-2%, 2%) scale(1.08); }
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 0;
+    }
+
+    .card,
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .brand-card {
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-card::before {
+      content: "";
+      position: absolute;
+      inset: -30% auto auto -20%;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(65,150,255,0.38), transparent 70%);
+      filter: blur(12px);
+    }
+
+    .brand-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -15% -20% auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,50,110,0.30), transparent 70%);
+      filter: blur(12px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.16);
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--soft-white);
+      margin-bottom: 18px;
+    }
+
+    .spark {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #49b3ff, #ff4d7a);
+      box-shadow: 0 0 18px rgba(255,255,255,0.8);
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 6vw, 5.4rem);
+      line-height: 0.92;
+      margin: 0;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .gradient-title {
+      background: linear-gradient(90deg, #84d7ff 0%, #ffffff 35%, #ffd3df 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 18px rgba(255,255,255,0.12);
+    }
+
+    .party-script {
+      display: block;
+      font-size: clamp(2.2rem, 5vw, 4.8rem);
+      font-style: italic;
+      text-transform: none;
+      margin-top: 6px;
+      color: #ffffff;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .lead {
+      color: var(--muted);
+      max-width: 580px;
+      font-size: 1.05rem;
+      line-height: 1.65;
+      margin: 20px 0 26px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .detail-box {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .detail-label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.68);
+      margin-bottom: 6px;
+    }
+
+    .detail-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .panel {
+      padding: 28px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 1.7rem;
+    }
+
+    .panel p {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    form {
+      display: grid;
+      gap: 15px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      color: #fff;
+      padding: 14px 16px;
+      border-radius: 16px;
+      font: inherit;
+      outline: none;
+      transition: 0.25s ease;
+    }
+
+    input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.55); }
+    select { appearance: none; }
+    option { color: #111; }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(255,255,255,0.38);
+      background: rgba(255,255,255,0.15);
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.08);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .choice-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .choice {
+      position: relative;
+    }
+
+    .choice input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .choice span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      text-align: center;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      transition: 0.25s ease;
+      padding: 12px;
+      font-weight: 700;
+    }
+
+    .choice input:checked + span {
+      background: linear-gradient(90deg, rgba(11,77,255,0.45), rgba(255,23,79,0.42));
+      border-color: rgba(255,255,255,0.38);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+    }
+
+    .cta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .note {
+      color: rgba(255,255,255,0.68);
+      font-size: 0.92rem;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      padding: 15px 22px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0e58ff, #ff2258);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.34);
+      filter: brightness(1.05);
+    }
+
+    .footer {
+      text-align: center;
+      color: rgba(255,255,255,0.65);
+      font-size: 0.92rem;
+      margin-top: 18px;
+    }
+
+    .message {
+      display: none;
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      line-height: 1.5;
+      border: 1px solid transparent;
+    }
+
+    .message.show { display: block; }
+    .message.success {
+      background: rgba(140,255,193,0.10);
+      border-color: rgba(140,255,193,0.35);
+      color: #eafff2;
+    }
+    .message.error {
+      background: rgba(255,210,217,0.12);
+      border-color: rgba(255,210,217,0.28);
+      color: #fff0f3;
+    }
+
+    @media (max-width: 920px) {
+      .panel, .brand-card { padding: 22px; border-radius: 24px; }
+      h1 { font-size: clamp(2.2rem, 12vw, 4rem); }
+      .party-script { font-size: clamp(2rem, 10vw, 3.6rem); }
+      .lead { font-size: 1rem; }
+      button { width: 100%; }
+      .cta { flex-direction: column; align-items: stretch; }
+
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .details,
+      .field-row,
+      .choice-group {
+        grid-template-columns: 1fr;
+      }
+
+      .wrap { padding-top: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+
+  <div class="wrap">
+    <section class="hero">
+      <div class="card brand-card">
+        <div class="eyebrow"><span class="spark"></span> Invitation officielle</div>
+        <h1>
+          <span class="gradient-title">Twenty-Two</span>
+          <span class="party-script">Party</span>
+        </h1>
+        <p class="lead">
+          Viens célébrer mes 22 ans dans une ambiance festive, élégante et lumineuse.
+          Merci de confirmer ta présence pour la soirée du <strong>30 mai 2026 à 19h</strong>.
+        </p>
+
+        <div id="countdownBox" class="detail-box" style="margin-bottom:14px; grid-column:1/-1; text-align:center;">
+            <span class="detail-label">Compte à rebours</span>
+            <span id="countdown" class="detail-value">Chargement...</span>
+          </div>
+        <div class="details">
+          <div class="detail-box">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">30 mai 2026</span>
+          </div>
+          <div class="detail-box">
+            <span class="detail-label">Heure</span>
+            <span class="detail-value">19h00</span>
+          </div>
+          <div class="detail-box">
+            <span class="detail-label">Ambiance</span>
+            <span class="detail-value">Soirée festive</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Valider ma participation</h2>
+        <p>Remplis ce formulaire pour confirmer ta présence à la soirée.</p>
+
+        <form id="rsvpForm">
+          <div class="field-row">
+            <div>
+              <label for="name">Nom complet</label>
+              <input id="name" name="name" type="text" placeholder="Ton nom et prénom" required />
+            </div>
+            <div>
+              <label for="email">Adresse e-mail</label>
+              <input id="email" name="email" type="email" placeholder="exemple@email.com" required />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="phone">Téléphone</label>
+              <input id="phone" name="phone" type="tel" placeholder="06 00 00 00 00" />
+            </div>
+            <div>
+              <label for="guests">Nombre de personnes</label>
+              <select id="guests" name="guests">
+                <option value="1">1 personne</option>
+                <option value="2">2 personnes</option>
+                <option value="3">3 personnes</option>
+                <option value="4">4 personnes</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label>Participation</label>
+            <div class="choice-group">
+              <label class="choice">
+                <input type="radio" name="attendance" value="Présent(e)" checked />
+                <span>Je serai présent(e)</span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="attendance" value="Absent(e)" />
+                <span>Je ne pourrai pas venir</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Un mot, une précision, une info sur le repas..."></textarea>
+          </div>
+
+          <div class="cta">
+            <span class="note">Validation instantanée en HTML / JavaScript.</span>
+            <button type="submit">Confirmer ma réponse</button>
+          </div>
+
+          <div id="formMessage" class="message" aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+
+    <div class="footer">Twenty-Two Party · 30 mai 2026 · 19h00</div>
+  </div>
+
+  <script>
+    const form = document.getElementById('rsvpForm');
+    const formMessage = document.getElementById('formMessage');
+
+    function showMessage(type, text) {
+      formMessage.className = `message show ${type}`;
+      formMessage.textContent = text;
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const attendance = document.querySelector('input[name="attendance"]:checked')?.value;
+      const guests = document.getElementById('guests').value;
+
+      if (!name || !email) {
+        showMessage('error', 'Merci de remplir au minimum ton nom et ton adresse e-mail.');
+        return;
+      }
+
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!emailOk) {
+        showMessage('error', 'Merci de saisir une adresse e-mail valide.');
+        return;
+      }
+
+      if (attendance === 'Présent(e)') {
+        showMessage('success', `Merci ${name} ! Ta présence est bien confirmée pour le 30 mai 2026 à 19h. Réservation enregistrée pour ${guests} personne(s).`);
+      } else {
+        showMessage('success', `Merci ${name}. Ta réponse a bien été prise en compte. Peut-être à une prochaine fête !`);
+      }
+
+      form.reset();
+      document.querySelector('input[name="attendance"][value="Présent(e)"]').checked = true;
+    });
+  
+    const countdown = document.getElementById('countdown');
+    const targetDate = new Date('2026-05-30T19:00:00');
+    function updateCountdown(){
+      const now = new Date();
+      const diff = targetDate - now;
+      if(diff <= 0){ countdown.textContent = 'La soirée commence !'; return; }
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hours = Math.floor((diff / (1000*60*60)) % 24);
+      const mins = Math.floor((diff / (1000*60)) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+      countdown.textContent = `${days}j ${hours}h ${mins}m ${secs}s`;
+    }
+    updateCountdown();
+    setInterval(updateCountdown,1000);
+  </script>
+</body>
+</html>
